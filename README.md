@@ -10,8 +10,9 @@ This is a pipeline to analyze RNAseq data from PDX samples. This pipeline uses f
 Requirements
 -
 To use this pipeline, you need to make a conda environment with some prerequisite program (snakemake, python, samtools, bedtools, and etc). Then the pipeline will be run on this specified environment.  
-
-	conda env create -f default_env.yaml
+```
+conda env create -f default_env.yaml
+```
 
 How to run this pipeline
 -
@@ -29,9 +30,14 @@ How to run this pipeline
 	
 2. In config file, you can also set specific parameters for each rule, e.g) number of threads, alignment options, ...
 	
-3. After changing the parameters in the config file, you can run the following code:  
+3. After changing the parameters in the config file, you can test the pipeline with '-np' option:  
+```
+snakemake --configfile config_XXX.yaml --use-conda --cores N -np
+```
 
-	snakemake --configfile config_XXX.yaml --use-conda --cores N
-
+   If it works, then you can run the pipeline without '-np'
+```
+snakemake --configfile config_XXX.yaml --use-conda --cores N
+```
 Then the pipeline will run following program:
-
+![alt text](http://url/to/img.png)
