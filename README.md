@@ -1,6 +1,25 @@
 # snakemake_RNAseq_PDX
-Before you use this pipeline, conda environment with some packages is required. 
-- 
+This is a pipeline to analyze RNAseq data from PDX samples. This pipeline uses following program:    
+Adapter trimming - cutadapt  
+Alignment- STAR  
+Removing ambiguous reads - ngs-disambiguate  
+Quantification - featureCounts (gene, exon)  
+Quanlity assessment - fastqc, multiqc
+Optional - novel junction (STAR two-pass alignment), star-fusion, RSEM (gene and isoform), DEXSeq (differential exon usage)
+
+Requirements
+-
+To use this pipeline, you need to make a conda environment with some prerequisite program (snakemake, python, samtools, bedtools, and etc). Then the pipeline will be run on this specified environment.  
+
+	conda 
+
+	
+
+
+
+
+
+
 
 
 This is a pipeline to analyze RNAseq data from PDX samples. You can set different modes by changing the parameters in the config file.
