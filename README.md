@@ -40,4 +40,4 @@ snakemake --configfile config_XXX.yaml --use-conda --cores N -np
 snakemake --configfile config_XXX.yaml --use-conda --cores N
 ```
 Then the pipeline will run following program:
-![alt text](https://github.com/bynjh007/snakemake_RNAseq_PDX/blob/master/dag.pdf)
+![diagram](https://github.com/bynjh007/snakemake_RNAseq_PDX/blob/master/dag.pdf)
