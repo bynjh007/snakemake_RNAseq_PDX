@@ -1,0 +1,8 @@
+name: featurecount
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - bioconductor-dexseq =1.28.1

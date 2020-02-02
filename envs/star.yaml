@@ -1,0 +1,8 @@
+name: star
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - star =2.7.2b

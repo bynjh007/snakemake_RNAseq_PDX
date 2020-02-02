@@ -1,0 +1,8 @@
+name: disambiguate
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - ngs-disambiguate =2018.05.03

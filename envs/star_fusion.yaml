@@ -1,0 +1,12 @@
+name: star_fusion
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - python =3.7.4
+  - star-fusion =1.8.1
+  - trinity =2.9.1
+  - igv-reports =0.9.4
+

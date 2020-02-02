@@ -1,0 +1,9 @@
+name: sambamba
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - star =2.6.0c
+  - sambamba =0.6.6
