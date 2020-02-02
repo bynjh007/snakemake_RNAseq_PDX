@@ -1,4 +1,8 @@
 # snakemake_RNAseq_PDX
+Before you use this pipeline, conda environment with some packages is required. 
+- 
+
+
 This is a pipeline to analyze RNAseq data from PDX samples. You can set different modes by changing the parameters in the config file.
 
 1. In config file, you can set different modes through the 'options' parametes.  
