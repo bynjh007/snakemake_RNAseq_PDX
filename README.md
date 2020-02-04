@@ -17,6 +17,7 @@ Then, the environment should be activated.
 ```
 conda activate default_env
 ```
+In here, "default_env" is the name of this specific environment defined in 'default_env.yaml' not the file name.
 
 How to run this pipeline
 -
