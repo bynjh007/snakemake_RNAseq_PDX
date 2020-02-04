@@ -15,7 +15,7 @@ rule star_preload:
         index_host = config['star_align']['index_host'],
         index_graft = config['star_align']['index_graft']
     output:
-        temp(touch(path.join(bam_dir, 'star_preload.done')))
+        touch(path.join(bam_dir, 'star_preload.done'))
     conda:
         '../envs/star.yaml'
     log:
@@ -190,11 +190,13 @@ if config['options']['novel_junction']:
 #####################################################
 
     # Using shared memory with genomeLoad
-    rule star_preload_2pass:
+    rule star_preload_1st:
+        input:
+            path.join(bam_dir, 'star_unload_pdx.done')
         params:
             config['star_align']['index_graft']
         output:
-            temp(touch(path.join(bam_dir, 'star_preload_1.done')))
+            touch(path.join(bam_dir, 'star_preload_1.done'))
         conda:
             '../envs/star.yaml'
         log:
@@ -249,6 +251,18 @@ if config['options']['novel_junction']:
             "cat {input.sj} | awk '($5>0 && $7>2 && $6==0)' | cut -f1-6 | sort | uniq > {output} "
             "&& rm -rf {params}"
 
+    rule genome_unload_1st:
+        input:
+            path.join(bam_dir, 'SJ_db', 'SJ.out.comb.tab')
+        output:
+            touch(path.join(bam_dir, 'star_unload_1st.done'))
+        params:
+            config['star_align']['index_graft']
+        conda:
+            '../envs/star.yaml'
+        shell:
+            'STAR --genomeLoad Remove --genomeDir {params}'
+        
     # indexing genome with the junctions obtained from all samples
     rule star_SJ_indexing:
         input:
@@ -273,9 +287,10 @@ if config['options']['novel_junction']:
     # Using shared memory for newly indexed genome
     rule star_preload_2nd:
         input:
-            path.join(bam_dir, 'SJ_db', 'sjdbList.out.tab')
+            pre = path.join(bam_dir, 'star_unload_1st.done'),
+            sj = path.join(bam_dir, 'SJ_db', 'sjdbList.out.tab')
         output:
-            temp(touch(path.join(bam_dir, 'star_preload_2.done')))
+            touch(path.join(bam_dir, 'star_preload_2.done'))
         params:
             path.join(bam_dir, 'SJ_db')
         conda:
@@ -316,21 +331,19 @@ if config['options']['novel_junction']:
             '&& mv {params.out_prefix}Log.final.out {params.qc_prefix}.Log.final.out'
 
     # unloading the loaded genomes
-    rule genome_unload_two_pass:
+    rule genome_unload_2nd:
         input:
             expand(path.join(bam_dir, '{sample}','Aligned.out.bam'),
                 sample = all_samples)
         output:
             touch(path.join(bam_dir, 'star_unload_2pass.done'))
         params:
-            first = config['star_align']['index_graft'],
-            second = path.join(bam_dir, 'SJ_db'),
+            sj = path.join(bam_dir, 'SJ_db'),
             rm = path.join(bam_dir, 'star_1') 
         conda:
             '../envs/star.yaml'
         shell:
-            'STAR --genomeLoad Remove --genomeDir {params.first} '
-            '&& STAR --genomeLoad Remove --genomeDir {params.second} '
+            'STAR --genomeLoad Remove --genomeDir {params.sj} '
             '&& rm -rf {params.rm}'
 
 
