@@ -16,7 +16,7 @@ options:
     bam2fastq: True
     paired: True
     novel_junction: True
-    star_fusion: True
+    star_fusion: False
     rsem: False
     dexseq: False
 
@@ -54,22 +54,12 @@ star_align:
     index_host: '/DATA/projects/j.bhin/reference/Mouse_gencode_M23_CTAT_lib_Dec062019.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa.star.idx' 
     index_graft: '/DATA/projects/j.bhin/reference/GRCh38_gencode_v32_CTAT_lib_Dec062019.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa.star.idx' 
     threads: 8
-    options_pdx:
-        - --chimSegmentMin 12
-        - --chimJunctionOverhangMin 12
-        - --chimOutJunctionFormat 1
-        - --alignSJDBoverhangMin 10
-        - --alignMatesGapMax 100000
-        - --alignIntronMax 100000
-        - --alignSJstitchMismatchNmax 5 -1 5 5
-        - --outSAMattrRGline ID:GRPundef
-        - --chimMultimapScoreRange 3
-        - --chimScoreJunctionNonGTAG -4
-        - --chimNonchimScoreDropMin 10
-        - --peOverlapNbasesMin 12
-        - --peOverlapMMp 0.1
-    options_disamb: ''
-    
+    options:
+        - --chimSegmentMin 10
+        - --chimJunctionOverhangMin 10
+        - --alignMatesGapMax 1000000
+        - --alignIntronMax 1000000
+
 #    - --quantMode TranscriptomeSAM  # for RSEM
 
     # requirements for STAR 2-pass alignment

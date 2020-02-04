@@ -39,7 +39,7 @@ rule star_align_host:
         temp(path.join(bam_dir, '{sample}_host','Aligned.out.bam'))
     params:
         index = config['star_align']['index_host'],
-        options = format_options(config['star_align']['options_pdx']),
+        options = format_options(config['star_align']['options']),
         out_prefix = path.join(bam_dir, '{sample}_host/') 
     conda:
         '../envs/star.yaml'
@@ -64,7 +64,7 @@ rule star_align_graft:
         temp(path.join(bam_dir, '{sample}_graft','Aligned.out.bam'))
     params:
         index = config['star_align']['index_graft'],
-        options = format_options(config['star_align']['options_pdx']),
+        options = format_options(config['star_align']['options']),
         out_prefix = path.join(bam_dir, '{sample}_graft/')
     conda:
         '../envs/star.yaml'
@@ -79,7 +79,6 @@ rule star_align_graft:
         '--genomeLoad LoadAndKeep --limitBAMsortRAM 30000000000 '
         '--chimOutType WithinBAM --outSAMunmapped Within '
         '--outReadsUnmapped None '
-        '--outSAMstrandField intronMotif '
         '--readFilesIn {input.fq} 2> {log}'
 
 # sorting based on qnames to run disambiguate tool
@@ -147,20 +146,6 @@ if config['options']['novel_junction']:
 # prepare STAR 2-pass alignment
 #####################################################
 
-    # sorting based on qnames to run bam2fastq
-#    rule sambamba_sort_qname_disamb:
-#        input:
-#            path.join(bam_dir, '{sample}_graft', 'Aligned.disamb.bam')
-#        output:
-#            temp(path.join(bam_dir, '{sample}_graft', 'Aligned.sort.bam')
-#        conda:
-#            '../envs/sambamba.yaml'
-#        threads:
-#            config['sambamba_sort']['threads']
-#        shell:
-#            'samtools sort -n -@ {threads} {input} {output} 2> {log}'
-#   
-    
     if config['options']['paired']:
 
         # transforming bam to fastq
@@ -233,7 +218,7 @@ if config['options']['novel_junction']:
             path.join(bam_dir, 'star_1', '{sample}', 'SJ.out.tab')
         params:
             index = config['star_align']['index_graft'],
-            options = format_options(config['star_align']['options_disamb']),
+            options = format_options(config['star_align']['options']),
             out_prefix = path.join(bam_dir, 'star_1', '{sample}/')
         conda:
             '../envs/star.yaml'
@@ -246,6 +231,7 @@ if config['options']['novel_junction']:
             '--outFileNamePrefix {params.out_prefix} --runThreadN {threads} '
             '--readFilesCommand gunzip -c --outSAMtype BAM Unsorted '
             '--genomeLoad LoadAndKeep --limitBAMsortRAM 30000000000 '
+            '--chimOutType Junctions '
             '--readFilesIn {input.fq} 2> {log}'
 
     # filtering out the low confident junctionis
@@ -309,7 +295,7 @@ if config['options']['novel_junction']:
             temp(path.join(bam_dir, '{sample}','Aligned.out.bam'))
         params:
             index = path.join(bam_dir, 'SJ_db'),
-            options = format_options(config['star_align']['options_disamb']),
+            options = format_options(config['star_align']['options']),
             out_prefix = path.join(bam_dir, '{sample}/'),
             qc_prefix = path.join(qc_dir, 'star_align','{sample}_final'),
             qc_dir = path.join(qc_dir, 'star_align')
@@ -324,6 +310,7 @@ if config['options']['novel_junction']:
             '--outFileNamePrefix {params.out_prefix} --runThreadN {threads} '
             '--readFilesCommand gunzip -c --outSAMtype BAM Unsorted '
             '--genomeLoad LoadAndKeep --limitBAMsortRAM 30000000000 '
+            '--chimOutType Junctions '
             '--readFilesIn {input.fq} 2> {log} '
             '&& mkdir -p {params.qc_dir} '
             '&& mv {params.out_prefix}Log.final.out {params.qc_prefix}.Log.final.out'
