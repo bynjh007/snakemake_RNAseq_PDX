@@ -13,6 +13,11 @@ To use this pipeline, you need to make a conda environment with some prerequisit
 ```
 conda env create -f default_env.yaml
 ```
+Then, the environment should be activated.
+```
+conda activate default_env
+```
+In here, "default_env" is the name of this specific environment defined in 'default_env.yaml' not the file name.
 
 How to run this pipeline
 -
@@ -40,4 +45,4 @@ snakemake --configfile config_XXX.yaml --use-conda --cores N -np
 snakemake --configfile config_XXX.yaml --use-conda --cores N
 ```
 Then the pipeline will run following program:
-![alt text](http://url/to/img.png)
+![diagram](https://github.com/bynjh007/snakemake_RNAseq_PDX/blob/master/dag.pdf)
