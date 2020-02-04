@@ -13,6 +13,10 @@ To use this pipeline, you need to make a conda environment with some prerequisit
 ```
 conda env create -f default_env.yaml
 ```
+Then, the environment should be activated.
+```
+conda activate default_env
+```
 
 How to run this pipeline
 -
