@@ -19,6 +19,12 @@ conda activate default_env
 ```
 In here, "default_env" is the name of this specific environment defined in 'default_env.yaml' not the file name.
 
+Genome database (CTAT_RESOURCE_LIB)
+-
+Human :https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/GRCh38_gencode_v32_CTAT_lib_Dec062019.plug-n-play.tar.gz   
+Mouse :https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/Mouse_gencode_M23_CTAT_lib_Dec062019.plug-n-play.tar.gz  
+
+
 How to run this pipeline
 -
 1. In config file, you can set different modes through the 'options' parametes.  
