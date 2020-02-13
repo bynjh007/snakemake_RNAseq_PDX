@@ -51,8 +51,8 @@ rule star_align_host:
         'STAR {params.options} --genomeDir {params.index} '
         '--outFileNamePrefix {params.out_prefix} --runThreadN {threads} '
         '--readFilesCommand gunzip -c --outSAMtype BAM Unsorted '
-        '--chimOutType WithinBAM '
-        '--genomeLoad LoadAndKeep --limitBAMsortRAM 30000000000 '
+        '--chimOutType Junctions WithinBAM --outSAMunmapped Within '
+        '--genomeLoad LoadAndKeep '
         '--readFilesIn {input.fq} 2> {log}'
 
 # alignment to graft genome
@@ -76,9 +76,8 @@ rule star_align_graft:
         'STAR {params.options} --genomeDir {params.index} '
         '--outFileNamePrefix {params.out_prefix} --runThreadN {threads} '
         '--readFilesCommand gunzip -c --outSAMtype BAM Unsorted '
-        '--genomeLoad LoadAndKeep --limitBAMsortRAM 30000000000 '
-        '--chimOutType WithinBAM --outSAMunmapped Within '
-        '--outReadsUnmapped None '
+        '--chimOutType Junctions WithinBAM --outSAMunmapped Within '
+        '--genomeLoad LoadAndKeep '
         '--readFilesIn {input.fq} 2> {log}'
 
 # sorting based on qnames to run disambiguate tool
@@ -129,15 +128,12 @@ rule genome_unload_pdx:
         touch(path.join(bam_dir, 'star_unload_pdx.done'))
     params:
         host = config['star_align']['index_host'],
-        graft = config['star_align']['index_host'],
-        rm = bam_dir
+        graft = config['star_align']['index_graft']
     conda:
         '../envs/star.yaml'
     shell:
         'STAR --genomeLoad Remove --genomeDir {params.host} '
-        '&& STAR --genomeLoad Remove --genomeDir {params.graft} '
-        '&& rm -rf {params.rm}/*_host'
-
+        '&& STAR --genomeLoad Remove --genomeDir {params.graft}'
 
 # Identification of novel junction based on two-pass alignment
 if config['options']['novel_junction']:
@@ -211,7 +207,7 @@ if config['options']['novel_junction']:
         pairs = ["_R1", "_R2"] if config['options']['paired'] else [""]
         return expand(fastq_path, pair = pairs)
 
-    # STAR-1st
+    # STAR-1st (normal alignment)
     rule star_align_1st:
         input:
             fq = align_inputs_disamb,
@@ -220,7 +216,6 @@ if config['options']['novel_junction']:
             path.join(bam_dir, 'star_1', '{sample}', 'SJ.out.tab')
         params:
             index = config['star_align']['index_graft'],
-            options = format_options(config['star_align']['options']),
             out_prefix = path.join(bam_dir, 'star_1', '{sample}/')
         conda:
             '../envs/star.yaml'
@@ -229,11 +224,10 @@ if config['options']['novel_junction']:
         log:
             path.join(log_dir, 'star_align_two_pass', '{sample}_1.log')
         shell:
-            'STAR {params.options} --genomeDir {params.index} '
+            'STAR --genomeDir {params.index} '
             '--outFileNamePrefix {params.out_prefix} --runThreadN {threads} '
             '--readFilesCommand gunzip -c --outSAMtype BAM Unsorted '
-            '--genomeLoad LoadAndKeep --limitBAMsortRAM 30000000000 '
-            '--chimOutType Junctions '
+            '--genomeLoad LoadAndKeep '
             '--readFilesIn {input.fq} 2> {log}'
 
     # filtering out the low confident junctionis
@@ -246,10 +240,11 @@ if config['options']['novel_junction']:
         output:
             path.join(bam_dir, 'SJ_db', 'SJ.out.comb.tab')
         params:
-            path.join(bam_dir, 'star_1')
+            star_host = bam_dir,
+            star_1 = path.join(bam_dir, 'star_1')
         shell:
             "cat {input.sj} | awk '($5>0 && $7>2 && $6==0)' | cut -f1-6 | sort | uniq > {output} "
-            "&& rm -rf {params}"
+            "&& rm -rf {params.star_host}/*_host {params.star_1}"
 
     rule genome_unload_1st:
         input:
@@ -300,7 +295,7 @@ if config['options']['novel_junction']:
         shell:
             'STAR --genomeLoad LoadAndExit --genomeDir {params} 2> {log}'
 
-    # STAR-2nd
+    # STAR-2nd (considering downstream analysis for chimeric alignment)
     rule star_align_2nd:
         input:
             fq = align_inputs_disamb,
@@ -324,8 +319,8 @@ if config['options']['novel_junction']:
             'STAR {params.options} --genomeDir {params.index} '
             '--outFileNamePrefix {params.out_prefix} --runThreadN {threads} '
             '--readFilesCommand gunzip -c --outSAMtype BAM Unsorted '
-            '--genomeLoad LoadAndKeep --limitBAMsortRAM 30000000000 '
-            '--chimOutType Junctions '
+            '--chimOutType Junctions WithinBAM --outSAMunmapped Within '
+            '--genomeLoad LoadAndKeep '
             '--readFilesIn {input.fq} 2> {log} '
             '&& mkdir -p {params.qc_dir} '
             '&& mv {params.out_prefix}Log.final.out {params.qc_prefix}.Log.final.out'

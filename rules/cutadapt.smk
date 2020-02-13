@@ -49,12 +49,10 @@ if config['options']['paired']:
             options = format_options(config['cutadapt']['options'])
         conda:
             '../envs/cutadapt.yaml'
-        threads:
-            config['cutadapt']['threads']
         log:
             path.join(log_dir, 'cutadapt', '{sample}.log')
         shell:
-            'cutadapt {params.options} -j {threads} -o {output.R1} -p {output.R2} '
+            'cutadapt {params.options} -o {output.R1} -p {output.R2} '
             '{input.R1} {input.R2} 2> {log}' 
 
 else:
@@ -86,12 +84,10 @@ else:
             options = format_options(config['cutadapt']['options'])
         conda:
             '../envs/cutadapt.yaml'
-        threads:
-            config['cutadapt']['threads']
         log:
             path.join(log_dir, 'cutadapt', '{sample}.log'),
         shell:
-            'cutadapt {params.options} -j {threads} -o {output} {input} 2> {log}'
+            'cutadapt {params.options} -o {output} {input} 2> {log}'
 
 
 
