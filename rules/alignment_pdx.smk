@@ -21,7 +21,7 @@ rule star_preload:
     log:
         path.join(log_dir, 'star_align', 'genome_preload.log')
     shell:
-        'STAR --genomeLoad LoadAndExit --genomeDir {params.index_host}'
+        'STAR --genomeLoad LoadAndExit --genomeDir {params.index_host} '
         '&& STAR --genomeLoad LoadAndExit --genomeDir {params.index_graft} 2> {log}'
 
 
